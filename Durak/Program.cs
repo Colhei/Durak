@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 
 
-enum AllCardsInDeck
+enum AllCardsInDeck // перелік усіх кард та їх нумерація
 {
     SixOfClubs = 1,
     SevenOfClubs,
@@ -14,8 +14,8 @@ enum AllCardsInDeck
     QueenOfClubs,
     KingOfClubs,
     AceOfClubs,
-    SixOfSpades,
-    SevenOfSpades,
+    SixOfSpades, // індекс - 10
+    SevenOfSpades, 
     EightOfSpades,
     NineOfSpades,
     TenOfSpades,
@@ -23,7 +23,7 @@ enum AllCardsInDeck
     QueenOfSpades,
     KingOfSpades,
     AceOfSpades,
-    SixOfDiamonds,
+    SixOfDiamonds, // індекс - 19
     SevenOfDiamonds,
     EightOfDiamonds,
     NineOfDiamonds,
@@ -32,7 +32,7 @@ enum AllCardsInDeck
     QueenOfDiamonds,
     KingOfDiamonds,
     AceOfDiamonds,
-    SixOfHearts,
+    SixOfHearts, // індекс - 28
     SevenOfHearts,
     EightOfHearts,
     NineOfHearts,
@@ -43,7 +43,7 @@ enum AllCardsInDeck
     AceOfHearts,
 }
 
-enum CardsSuits
+enum CardsSuits // масті карт
 {
     Clubs = 1,
     Spades,
@@ -51,7 +51,7 @@ enum CardsSuits
     Hearts,
 }
 
-enum HighnessOfCards
+enum HighnessOfCards // старшинство карт
 {
     Six = 1,
     Seven,
@@ -65,17 +65,15 @@ enum HighnessOfCards
 }
 
 
-class Cards
+class Cards // клас "карти"
 {
     public HighnessOfCards Highness;
     public CardsSuits Suit;
+    private bool CardAccessibility = true;
 
-    public static Cards[] AllCardsArray = new Cards[36];
-    public static Cards[] ShuffledCardDeck= new Cards[36];
+    public static Cards[] AllCardsArray = new Cards[36]; // масив з усіма картами у вигляді об'єктів класу
 
-
-
-    public static void GetCardsToArray()
+    public static void GetCardsToArray() // метод утворення масиву з картами AllCardsArray
     {
         int i = 0;
         foreach (CardsSuits suit in Enum.GetValues(typeof(CardsSuits)))
@@ -89,41 +87,51 @@ class Cards
             }
         }
 
-        // foreach (Cards card in AllCardsArray)
-        // {
-        //     Console.WriteLine($"{card.Highness} of {card.Suit}");
-        // }
+        
     }
+    
 
-    public static void ShuffleCards()
+    public static void ShuffleCards() // метод перемішування карт
     {
         AllCardsInDeck[] NewShuffledDeck = new AllCardsInDeck[36];
+        int iter = 0;
         NewShuffledDeck = OtherMethods.Shuffle();
-        for (int i = 0; i < 36; i++)
+        // створення масиву з пересортованими картами переведений у об'єкти класу Cards
+        // Cards[] ShuffledDeck = new  Cards[36];
+        foreach (var card in AllCardsArray)
         {
-            while (true)
-            {
-                
-            }
+            (CardsSuits, HighnessOfCards) Card = OtherMethods.Convert(NewShuffledDeck[iter]);
+            // Console.WriteLine($"{Card.Item1} {Card.Item2}");
+            
+            // ShuffledDeck[iter].Suit = Card.Item1;
+            // ShuffledDeck[iter].Highness = Card.Item2;
+
+            card.Suit = Card.Item1;
+            card.Highness = Card.Item2;
+            
+            iter++;
         }
+        // AllCardsArray = ShuffledDeck;
+        
+        
     }
 }
 
 
 
-class OtherMethods
+class OtherMethods // клас з усіма іншими методами
 {
     private static Random rand = new Random();
-    public static (CardsSuits, HighnessOfCards) Convert(AllCardsInDeck card)
+    public static (CardsSuits, HighnessOfCards) Convert(AllCardsInDeck card) // метод конвертації з обєкту переліку AllCardsInDeck
     {
         CardsSuits suit;
         HighnessOfCards rank;
-        int[] Inted;
+        int[] Inted; // індекси (масть, старшинство) переліків CardsSuits та HighnessOfCards
         static int[] ConvertToInt(AllCardsInDeck card) //Конвертування з переліку всіх карт до класу Cards
         {
-            int[] result = new int[2];
-            int Input = (int)card;
-            if (Input <= 9)
+            int[] result = new int[2]; // результат у вигляді масиву з двох чисел (масть, старшинство)
+            int Input = (int)card; // індекс вхідної карти з переліку AllCardsInDeck
+            if (Input <= 9) // перевірка масті
             {
                 result[0] = 1;
             }
@@ -140,7 +148,7 @@ class OtherMethods
                 result[0] = 4;
             }
 
-            switch (Input)
+            switch (Input) // перевірка старшинства
             {
                 case 1 or 10 or 19 or 28:
                     result[1] = 1;
@@ -171,7 +179,7 @@ class OtherMethods
                     break;
             }
 
-            if (result[0] != null && result[1] != null)
+            if (result[0] != null && result[1] != null) // перевірка можливості результату
             {
                 return result;
             }
@@ -183,7 +191,7 @@ class OtherMethods
         }
 
         Inted = ConvertToInt(card);
-        switch (Inted[0])
+        switch (Inted[0]) // генерування масті карти з переліку CardsSuits
         {
             case 1:
                 suit = CardsSuits.Clubs;
